@@ -53,3 +53,10 @@ services:
       - 8080:80
     volumes:
       - /sessions
+  blog-watch:
+    image: node:12
+    container_name: blog-watch
+    working_dir: /home/app
+    command: "npm run watch"
+    volumes:
+      - ./web:/home/app

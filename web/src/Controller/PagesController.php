@@ -31,6 +31,13 @@ use Cake\View\Exception\MissingTemplateException;
  */
 class PagesController extends AppController
 {
+
+    // この index メソッドを追加します。
+    public function index(): ?Response
+    {
+        return $this->render();
+    }
+
     /**
      * Displays a view
      *
