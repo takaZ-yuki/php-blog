@@ -1,0 +1,55 @@
+version: '3.5'
+
+services:
+  blog-web:
+    image: nginx:latest
+    container_name: blog-web
+    restart: always
+    environment:
+      TZ: 'Asia/Tokyo'
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker/local/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./web:/var/www/html
+
+  blog-app:
+    build: ./docker/local/php-fpm
+    container_name: blog-app
+    volumes:
+      - ./web:/var/www/html
+      - ./docker/local/php-fpm/php.ini:/usr/local/etc/php/php.ini
+
+  blog-mysql:
+#    image: mysql:latest
+    image: mysql:5.7
+    restart: always
+    container_name: blog-mysql
+    environment:
+      MYSQL_DATABASE: blog_db
+      MYSQL_USER: blog_user
+      MYSQL_PASSWORD: blog_user123
+      MYSQL_ROOT_PASSWORD: password
+      TZ: 'Asia/Tokyo'
+    volumes:
+      - ./docker/local/mysql/etc-mysql.cnf:/etc/mysql/conf.d/etc-mysql.cnf
+      - ./db-data:/var/lib/mysql
+      - ./docker/local/mysql/initdb.d:/docker-entrypoint-initdb.d
+    ports:
+      - 3306:3306
+
+  blog-phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: blog-phpmyadmin
+    restart: always
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=blog-mysql
+      - PMA_USER=root
+      - PMA_PASSWORD=password
+    links:
+      - blog-mysql
+    ports:
+      - 8080:80
+    volumes:
+      - /sessions
